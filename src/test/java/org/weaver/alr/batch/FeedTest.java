@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.weaver.alr.batch.config.MyConfig;
 import org.weaver.alr.batch.model.SettingVO;
@@ -13,6 +15,9 @@ import org.weaver.alr.batch.util.JsonUtil;
 
 public class FeedTest extends MyConfig{
 
+	private static final Logger logger = LoggerFactory.getLogger(FeedTest.class);
+
+	
 	@Autowired
 	private RSSFeeder rSSFeeder;
 	
@@ -21,27 +26,27 @@ public class FeedTest extends MyConfig{
 	
 	@Before
 	public void testJson(){
-		System.out.println("testJson");
+		logger.debug("testJson");
 		
 		String config = FileUtil.readFile("sample.json");
-		System.out.println(config);
+		logger.debug(config);
 		
 		setting = (SettingVO) JsonUtil.fromJson(config, SettingVO.class);
-		System.out.println(JsonUtil.toJson(setting));
+		logger.debug(JsonUtil.toJson(setting));
 	}
 	
-	@Test
+//	@Test
 	public void test() throws InterruptedException {
-		System.out.println("main");
+		logger.debug("main");
 		
 		List<TaskVO> tasks =	setting.getTasks();
 		for(int i=0 ; i<tasks.size() ; i++){
 			
 			TaskVO task = tasks.get(i);
-			System.out.println("----------------"+i+"------------------------");
-			System.out.println(task.getName());
-			System.out.println(JsonUtil.toJson(task.getInput()));
-			System.out.println(JsonUtil.toJson(task.getOutput()));
+			logger.debug("----------------"+i+"------------------------");
+			logger.debug(task.getName());
+			logger.debug(JsonUtil.toJson(task.getInput()));
+			logger.debug(JsonUtil.toJson(task.getOutput()));
 
 			rSSFeeder.run(task.getName(), task.getInput().getUrl(), task.getPipeline());
 		}

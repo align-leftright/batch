@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
@@ -23,6 +25,9 @@ import com.rometools.rome.feed.synd.SyndEntry;
 
 @Component
 public class RSSFeeder {
+	
+	
+	private static final Logger logger = LoggerFactory.getLogger(RSSFeeder.class);
 
 	@Autowired
 	private DynamicChannelResolver dynamicChannelResolver;
@@ -38,8 +43,8 @@ public class RSSFeeder {
 			Message<SyndEntry> message;
 			while( (message = (Message<SyndEntry>)feedChannel.receive()) != null){
 
-				System.out.println("----------------------------------------------------------");
-				System.out.println(url);
+				logger.debug("----------------------------------------------------------");
+				logger.debug(url);
 
 				SyndEntry entry = (SyndEntry)message.getPayload();
 				MySyndEntry myEntry = new MySyndEntry(entry);
@@ -48,12 +53,12 @@ public class RSSFeeder {
 				PipelineManager pipelineManager = buildPipelineManager(name, pipelineList);
 				processPipe(myEntry, pipelineManager);
 				
-				System.out.println(myEntry);
-				System.out.println("----------------------------------------------------------");
+				logger.debug(myEntry.toString());
+				logger.debug("----------------------------------------------------------");
 			}
 
 		} catch(Exception e ){
-			System.out.println(e);
+			logger.error(e.toString());
 		}
 	}
 
@@ -64,7 +69,7 @@ public class RSSFeeder {
 		}
 
 		Elements elements = JsoupUtil.getAllElements(myEntry.getSyndEntry().getUri());
-		System.out.println("pipelineManager name : "+pipelineManager.getName());
+		logger.debug("pipelineManager name : "+pipelineManager.getName());
 		Map<String, Object> result = pipelineManager.doPipeline(elements);
 		
 		if(result != null){
