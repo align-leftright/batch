@@ -1,0 +1,53 @@
+{
+  "tasks": [
+    {
+      "name": "naver",
+      "input": {
+        "type": "rss",
+        "name": "hani",
+        "url": "http://www.hani.co.kr/rss/politics/"
+      },
+      "pipeline": [
+        {
+          "name": "shortText",
+          "pipes": [
+            {
+              "pipe": "HtmlSearchPipe",
+              "type": "class",
+              "key": "article-text"
+            },
+            {
+              "pipe": "HtmlParserPipe",
+              "type": "text"
+            }
+          ]
+        },
+        {
+          "name": "imageUrl",
+          "pipes": [
+            {
+              "pipe": "HtmlSearchPipe",
+              "type": "class",
+              "key": "article-text"
+            },
+            {
+              "pipe": "HtmlParserPipe",
+              "type": "image",
+              "sortType": "size"
+            }
+          ]
+        }
+      ],
+      "output": {
+        "type": "elasticsearch",
+        "host": "",
+        "port": 9200,
+        "index": ""
+      }
+    }
+  ],
+  "reload": {
+    "enable": "true",
+    "period": ""
+  }
+}
