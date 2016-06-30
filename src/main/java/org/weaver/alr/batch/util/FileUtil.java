@@ -4,12 +4,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
+
+import org.apache.commons.io.FileUtils;
 
 public class FileUtil {
 
 
 	public static String readFile(String classpath){
-
 		BufferedReader br = null;
 		StringBuilder sb  = new StringBuilder();
 
@@ -32,9 +34,13 @@ public class FileUtil {
 				ex.printStackTrace();
 			}
 		}
-
 		return sb.toString();
-
 	}
 
+	public static File creatTempFile(URL url) throws IOException{
+		File file = new File("test.jpg");
+		FileUtils.copyURLToFile(url, file);	
+		return file;
+	}
+	
 }

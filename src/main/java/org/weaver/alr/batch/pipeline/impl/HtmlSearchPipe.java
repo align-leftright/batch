@@ -10,7 +10,6 @@ public class HtmlSearchPipe extends SyncPipe<Elements, Elements>{
 	
 	private String type;
 	private String key;
-	
 
 	public HtmlSearchPipe(String type, String key) {
 		super();

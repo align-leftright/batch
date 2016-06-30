@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.weaver.alr.batch.config.MyConfig;
 import org.weaver.alr.batch.model.SettingVO;
 import org.weaver.alr.batch.model.TaskVO;
+import org.weaver.alr.batch.output.impl.ElasticSearchOutput;
 import org.weaver.alr.batch.util.FileUtil;
 import org.weaver.alr.batch.util.JsonUtil;
 
@@ -21,8 +22,12 @@ public class FeedTest extends MyConfig{
 	@Autowired
 	private RSSFeeder rSSFeeder;
 	
-	private SettingVO setting;
+	@Autowired
+	private ElasticSearchOutput output;
+
 	
+	
+	private SettingVO setting;
 	
 	@Before
 	public void testJson(){
@@ -35,11 +40,13 @@ public class FeedTest extends MyConfig{
 		logger.debug(JsonUtil.toJson(setting));
 	}
 	
-//	@Test
+	
+	@Test
 	public void test() throws InterruptedException {
 		logger.debug("main");
 		
 		List<TaskVO> tasks =	setting.getTasks();
+		
 		for(int i=0 ; i<tasks.size() ; i++){
 			
 			TaskVO task = tasks.get(i);
@@ -48,7 +55,7 @@ public class FeedTest extends MyConfig{
 			logger.debug(JsonUtil.toJson(task.getInput()));
 			logger.debug(JsonUtil.toJson(task.getOutput()));
 
-			rSSFeeder.run(task.getName(), task.getInput().getUrl(), task.getPipeline());
+			rSSFeeder.run(task.getName(), task.getInput().getUrl(), task.getPipeline(), output);
 		}
 	}
 

@@ -1,16 +1,16 @@
 package org.weaver.alr.batch.parse;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
+import java.io.File;
 import java.net.URL;
 import java.util.Comparator;
-
-import javax.imageio.ImageIO;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.weaver.alr.batch.html.vo.ArticleImage;
 import org.weaver.alr.batch.parse.comparator.ComparatorFactory;
+import org.weaver.alr.batch.util.FileUtil;
+import org.weaver.alr.batch.util.ImageReaderUtil;
 import org.weaver.alr.batch.util.StringUtil;
 
 import com.gs.collections.impl.set.sorted.mutable.TreeSortedSet;
@@ -24,7 +24,7 @@ public class MyHtmlParser extends HtmlParser{
 	public MyHtmlParser(){
 		this.comparator = ComparatorFactory.build();
 	}
-	
+
 	public MyHtmlParser(Comparator<ArticleImage> comparator){
 		this.comparator = comparator;
 	}
@@ -58,10 +58,12 @@ public class MyHtmlParser extends HtmlParser{
 	}
 
 	private ArticleImage convertImage(Element imgElement){
+
+		File file = null;
 		String src;
 		int widthInt;
 		int heightInt;
-
+		
 		String width  = imgElement.attr("width");
 		String height = imgElement.attr("height");
 
@@ -76,13 +78,18 @@ public class MyHtmlParser extends HtmlParser{
 
 		if( StringUtil.isEmpty(width) || StringUtil.isEmpty(height) ){
 			try {
+				
 				URL url = new URL(src);
-				BufferedImage image = ImageIO.read(url);
+				file = FileUtil.creatTempFile(url);
+				BufferedImage image = ImageReaderUtil.readImage(file);
+				
 				widthInt          = image.getWidth();
 				heightInt         = image.getHeight();
-			}catch (IOException e) {
+			}catch (Exception e) {
 				e.printStackTrace();
 				return null;
+			}finally{
+//				file.delete();
 			}
 		}else{
 			widthInt  = Integer.parseInt(width);
