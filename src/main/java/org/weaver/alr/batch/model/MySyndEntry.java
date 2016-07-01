@@ -1,6 +1,6 @@
 package org.weaver.alr.batch.model;
 
-import org.weaver.alr.batch.util.DateUtIl;
+import org.weaver.alr.batch.common.util.DateUtIl;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 

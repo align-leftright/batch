@@ -1,4 +1,4 @@
-package org.weaver.alr.batch.util;
+package org.weaver.alr.batch.common.util;
 
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;

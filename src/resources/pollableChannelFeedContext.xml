@@ -12,7 +12,6 @@
             http://www.springframework.org/schema/integration/feed 
             http://www.springframework.org/schema/integration/feed/spring-integration-feed.xsd">
 
-	<context:property-placeholder />
 
 	<int-feed:inbound-channel-adapter id="jihoFeedAdapter"
 		channel="myChannel" auto-startup="false" url="${url}">

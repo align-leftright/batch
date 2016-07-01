@@ -1,4 +1,4 @@
-package org.weaver.alr.batch.util;
+package org.weaver.alr.batch.common.util;
 
 import com.google.gson.Gson;
 

@@ -1,16 +1,16 @@
-package org.weaver.alr.batch.html.vo;
+package org.weaver.alr.batch.model;
 
-public class ArticleImage {
+public class ArticleImageVO {
 
 	int width;
 	int height;
 	String src;
 
-	public ArticleImage(){
+	public ArticleImageVO(){
 
 	}
 
-	public ArticleImage(int width, int height, String src) {
+	public ArticleImageVO(int width, int height, String src) {
 		super();
 		this.width = width;
 		this.height = height;

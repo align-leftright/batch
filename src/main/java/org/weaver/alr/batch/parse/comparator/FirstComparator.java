@@ -3,12 +3,12 @@ package org.weaver.alr.batch.parse.comparator;
 import java.util.Comparator;
 
 import org.springframework.stereotype.Component;
-import org.weaver.alr.batch.html.vo.ArticleImage;
+import org.weaver.alr.batch.model.ArticleImageVO;
 
 @Component
-public class FirstComparator implements Comparator<ArticleImage>{
+public class FirstComparator implements Comparator<ArticleImageVO>{
 
-	public int compare(ArticleImage o1, ArticleImage o2) {
+	public int compare(ArticleImageVO o1, ArticleImageVO o2) {
 		return 1;
 	}
 

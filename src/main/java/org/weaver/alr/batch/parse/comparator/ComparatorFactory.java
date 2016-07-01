@@ -2,7 +2,7 @@ package org.weaver.alr.batch.parse.comparator;
 
 import java.util.Comparator;
 
-import org.weaver.alr.batch.html.vo.ArticleImage;
+import org.weaver.alr.batch.model.ArticleImageVO;
 
 public class ComparatorFactory {
 
@@ -11,11 +11,11 @@ public class ComparatorFactory {
 		FIRST_IMAGE
 	}
 
-	public static Comparator<ArticleImage> build(){
+	public static Comparator<ArticleImageVO> build(){
 		return new SizeComparator();
 	}
 
-	public static Comparator<ArticleImage> build(ImageSortType type){
+	public static Comparator<ArticleImageVO> build(ImageSortType type){
 		switch (type) {
 		case FIRST_IMAGE:
 			return new FirstComparator();

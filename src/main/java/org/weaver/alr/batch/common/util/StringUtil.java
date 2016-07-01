@@ -1,4 +1,4 @@
-package org.weaver.alr.batch.util;
+package org.weaver.alr.batch.common.util;
 
 public class StringUtil {
 	

@@ -1,4 +1,4 @@
-package org.weaver.alr.batch.util;
+package org.weaver.alr.batch.common.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

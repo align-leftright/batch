@@ -1,12 +1,16 @@
-package org.weaver.alr.batch.news;
+package org.weaver.alr.batch.metadata;
 
-public class Metadata {
+import java.util.Date;
+
+
+public class News {
 	private String id;
 	private String channel;
 	private String title;
 	private String description;
 	private String imageUrl;
 	private String linkUrl;
+	private Date publishedDate;
 
 	public String getId() {
 		return id;
@@ -44,13 +48,11 @@ public class Metadata {
 	public void setLinkUrl(String linkUrl) {
 		this.linkUrl = linkUrl;
 	}
-	
-	
-	@Override
-	public String toString() {
-		return "Metadata [id=" + id + ", channel=" + channel + ", title="
-				+ title + ", description=" + description + ", imageUrl="
-				+ imageUrl + ", linkUrl=" + linkUrl + "]";
+	public Date getPublishedDate() {
+		return publishedDate;
+	}
+	public void setPublishedDate(Date publishedDate) {
+		this.publishedDate = publishedDate;
 	}
 	
 	

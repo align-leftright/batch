@@ -7,11 +7,11 @@ import java.util.Comparator;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.weaver.alr.batch.html.vo.ArticleImage;
+import org.weaver.alr.batch.common.util.FileUtil;
+import org.weaver.alr.batch.common.util.ImageReaderUtil;
+import org.weaver.alr.batch.common.util.StringUtil;
+import org.weaver.alr.batch.model.ArticleImageVO;
 import org.weaver.alr.batch.parse.comparator.ComparatorFactory;
-import org.weaver.alr.batch.util.FileUtil;
-import org.weaver.alr.batch.util.ImageReaderUtil;
-import org.weaver.alr.batch.util.StringUtil;
 
 import com.gs.collections.impl.set.sorted.mutable.TreeSortedSet;
 
@@ -19,13 +19,13 @@ public class MyHtmlParser extends HtmlParser{
 	
 	private static final int TEXT_MAX_SIZE = 100;	
 	
-	private Comparator<ArticleImage> comparator;
+	private Comparator<ArticleImageVO> comparator;
 	
 	public MyHtmlParser(){
 		this.comparator = ComparatorFactory.build();
 	}
 
-	public MyHtmlParser(Comparator<ArticleImage> comparator){
+	public MyHtmlParser(Comparator<ArticleImageVO> comparator){
 		this.comparator = comparator;
 	}
 	
@@ -34,7 +34,7 @@ public class MyHtmlParser extends HtmlParser{
 		if(elements == null || elements.isEmpty()){
 			return null;
 		}
-		TreeSortedSet<ArticleImage> treeSortedSet = new TreeSortedSet<ArticleImage>(comparator);
+		TreeSortedSet<ArticleImageVO> treeSortedSet = new TreeSortedSet<ArticleImageVO>(comparator);
 		Elements imgElements;
 		try {
 			imgElements = elements.select("img");
@@ -43,7 +43,7 @@ public class MyHtmlParser extends HtmlParser{
 		}
 
 		for(Element imgElement : imgElements){
-			ArticleImage articleImage = convertImage(imgElement);
+			ArticleImageVO articleImage = convertImage(imgElement);
 			if(articleImage != null){
 				treeSortedSet.add(articleImage);
 			}else{
@@ -57,7 +57,7 @@ public class MyHtmlParser extends HtmlParser{
 		return null;
 	}
 
-	private ArticleImage convertImage(Element imgElement){
+	private ArticleImageVO convertImage(Element imgElement){
 
 		File file = null;
 		String src;
@@ -67,7 +67,7 @@ public class MyHtmlParser extends HtmlParser{
 		String width  = imgElement.attr("width");
 		String height = imgElement.attr("height");
 
-		src    = imgElement.attr("src");
+		src = imgElement.attr("src");
 		if(StringUtil.isEmpty(src)){
 			src = imgElement.attr("data-src");
 		}
@@ -78,7 +78,6 @@ public class MyHtmlParser extends HtmlParser{
 
 		if( StringUtil.isEmpty(width) || StringUtil.isEmpty(height) ){
 			try {
-				
 				URL url = new URL(src);
 				file = FileUtil.creatTempFile(url);
 				BufferedImage image = ImageReaderUtil.readImage(file);
@@ -89,7 +88,7 @@ public class MyHtmlParser extends HtmlParser{
 				e.printStackTrace();
 				return null;
 			}finally{
-//				file.delete();
+				file.delete();
 			}
 		}else{
 			widthInt  = Integer.parseInt(width);
@@ -100,7 +99,7 @@ public class MyHtmlParser extends HtmlParser{
 			return null;
 		}
 
-		return new ArticleImage(widthInt, heightInt, src);
+		return new ArticleImageVO(widthInt, heightInt, src);
 	}
 
 	

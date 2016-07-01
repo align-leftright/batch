@@ -3,12 +3,12 @@ package org.weaver.alr.batch.parse.comparator;
 import java.util.Comparator;
 
 import org.springframework.stereotype.Component;
-import org.weaver.alr.batch.html.vo.ArticleImage;
+import org.weaver.alr.batch.model.ArticleImageVO;
 
 @Component
-public class SizeComparator implements Comparator<ArticleImage>{
+public class SizeComparator implements Comparator<ArticleImageVO>{
 
-	public int compare(ArticleImage o1, ArticleImage o2) {
+	public int compare(ArticleImageVO o1, ArticleImageVO o2) {
 		int area1 = o1.getHeight() * o2.getWidth();
 		int area2 = o2.getHeight() * o2.getWidth();
 

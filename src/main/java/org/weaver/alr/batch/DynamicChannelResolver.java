@@ -19,7 +19,7 @@ public class DynamicChannelResolver
 
 	public static final int MAX_CACHE_SIZE = 999999;
 
-	private static String CONFIG_PATH = "pollableChannelFeedContext.xml";
+	private static final String CONFIG_PATH = "pollableChannelFeedContext.xml";
 
 	private final Map<ChannelManagement, ConfigurableApplicationContext> contexts = new HashMap<ChannelManagement, ConfigurableApplicationContext>();
 
@@ -63,7 +63,7 @@ public class DynamicChannelResolver
 			MessageChannel channel = ctx.getBean("myChannel", PollableChannel.class);
 			MessageChannel controlChannel = ctx.getBean("controlChannel", MessageChannel.class);
 			
-			myChannels = new ChannelManagement(controlChannel, channel, url, null, null);
+			myChannels = new ChannelManagement(controlChannel, channel, url);
 			
 			this.channelManagements.put(url, myChannels);
 			//Will works as the same reference is presented always
@@ -77,22 +77,17 @@ public class DynamicChannelResolver
 		System.setProperty("url", url);
 	}
 
-
+	
 	public class ChannelManagement{
 
 		private MessageChannel controlChannel;
 		public MessageChannel channel;
-
 		String url;
-		String textSearchKey;
-		String imageSearchKey;
 		
-		ChannelManagement(MessageChannel controlChannel, MessageChannel channel, String url, String textSearchKey, String imageSearchKey){
+		ChannelManagement(MessageChannel controlChannel, MessageChannel channel, String url){
 			this.controlChannel=controlChannel;
 			this.channel=channel;
 			this.url=url;
-			this.textSearchKey=textSearchKey;
-			this.imageSearchKey=imageSearchKey;
 		}
 
 		public void start(){
@@ -107,24 +102,9 @@ public class DynamicChannelResolver
 			return url;
 		}
 
-		public String getTextSearchKey() {
-			return textSearchKey;
-		}
-
-		public String getImageSearchKey() {
-			return imageSearchKey;
-		}
 
 		public void setUrl(String url) {
 			this.url = url;
-		}
-
-		public void setTextSearchKey(String textSearchKey) {
-			this.textSearchKey = textSearchKey;
-		}
-
-		public void setImageSearchKey(String imageSearchKey) {
-			this.imageSearchKey = imageSearchKey;
 		}
 
 	}

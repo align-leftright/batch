@@ -6,7 +6,7 @@ import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-import org.weaver.alr.batch.util.ImageReaderUtil;
+import org.weaver.alr.batch.common.util.ImageReaderUtil;
 
 public class ImageTest {
 
