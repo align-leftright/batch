@@ -46,6 +46,7 @@ public class RSSFeeder extends Thread{
 	private Output output;
 	
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
 		try {

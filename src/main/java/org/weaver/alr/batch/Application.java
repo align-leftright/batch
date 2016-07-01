@@ -14,13 +14,26 @@ public class Application {
 
 	private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
+	private static String path=null;
 	
 	public static void main(String[] args) {
+		
+		logger.info("main------------------");
+		logger.info("String[] args");
+		for(int i=0 ; i<args.length ; i++){
+			logger.info(args[i]);
+		}
+		if(args.length == 1){
+			path = args[0];
+		}
+		
 		ApplicationContext ctx = SpringApplication.run(ContextConfig.class, args);
 		RSSManager rSSManager = ctx.getBean(RSSManager.class);
 		
-		rSSManager.init();
+		logger.info("init------------------");
+		rSSManager.init(path);
 		try {
+			logger.info("run------------------");
 			rSSManager.run();
 		} catch (InterruptedException e) {
 			e.printStackTrace();

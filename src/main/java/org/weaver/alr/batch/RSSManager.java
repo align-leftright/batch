@@ -12,6 +12,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.weaver.alr.batch.common.util.FileUtil;
 import org.weaver.alr.batch.common.util.JsonUtil;
+import org.weaver.alr.batch.common.util.StringUtil;
 import org.weaver.alr.batch.model.SettingVO;
 import org.weaver.alr.batch.model.TaskVO;
 import org.weaver.alr.batch.output.impl.ElasticSearchOutput;
@@ -32,12 +33,15 @@ public class RSSManager {
 
 	private List<SettingVO> settingList;
 	
-	
+	public void init(String path){
+		logger.info("init");
 
-	public void init(){
-		logger.debug("init");
+		if(	StringUtil.isEmpty(path) ){
+			path = "channels";
+		}
+		
 		settingList = new LinkedList<SettingVO>();
-		List<File> fileList = FileUtil.listFilesForFolder(FileUtil.getFile("channels"));
+		List<File> fileList = FileUtil.listFilesForFolder(FileUtil.getFile(path));
 		for(File file : fileList){
 			String config = FileUtil.readFile(file);
 			SettingVO setting = (SettingVO) JsonUtil.fromJson(config, SettingVO.class);
@@ -47,25 +51,11 @@ public class RSSManager {
 	
 	
 	public void run() throws InterruptedException {
-		logger.debug("test");
+		logger.info("test");
 		System.out.println("settingList size : "+settingList.size());
 		for(SettingVO setting : settingList){
 			run(setting);
 		}
-		
-//		for (;;) {
-//			int count = taskExecutor.getActiveCount();
-//			System.out.println("Active Threads : " + count);
-//			try {
-//				Thread.sleep(1000*60*30);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//			if (count == 0) {
-//				taskExecutor.shutdown();
-//				break;
-//			}
-//		}
 
 	}
 
@@ -73,14 +63,22 @@ public class RSSManager {
 		List<TaskVO> tasks = setting.getTasks();
 		for(int i=0 ; i<tasks.size() ; i++){
 			TaskVO task = tasks.get(i);
-			logger.debug("----------------"+i+"------------------------");
-			logger.debug(task.getName());
-			logger.debug(JsonUtil.toJson(task.getInput()));
-			logger.debug(JsonUtil.toJson(task.getOutput()));
+			logger.info("----------------"+i+"------------------------");
+			logger.info(task.getName());
+			logger.info(JsonUtil.toJson(task.getInput()));
+			logger.info(JsonUtil.toJson(task.getOutput()));
 
 			RSSFeeder rSSFeeder = context.getBean(RSSFeeder.class);
 			rSSFeeder.initialize(task.getName(), task.getInput().getUrl(), task.getPipeline(), output);
 			taskExecutor.execute(rSSFeeder);
 		}
+	}
+	
+	public int getActiveCount(){
+		return taskExecutor.getActiveCount();
+	}
+	
+	public void shutdown(){
+		taskExecutor.shutdown();
 	}
 }

@@ -53,7 +53,10 @@ public class FileUtil {
 	}
 	
 	
-	public static List<File> listFilesForFolder(final File folder) {
+	public static List<File> listFilesForFolder(final File folder) { 
+		if(folder == null){
+			return null;
+		}
 		
 		LinkedList<File> fileList = new LinkedList<File>();
 	    for (final File fileEntry : folder.listFiles()) {

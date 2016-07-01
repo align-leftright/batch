@@ -2,12 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>FeedExample</groupId>
-	<artifactId>FeedExample</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<groupId>alr-batch</groupId>
+	<artifactId>alr-batch</artifactId>
+	<version>0.0.1</version>
 	<packaging>jar</packaging>
 
-	<name>FeedExample</name>
+	<name>alr-batch</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -106,7 +106,6 @@
 
 
 
-
 		<dependency>
 			<groupId>org.elasticsearch</groupId>
 			<artifactId>elasticsearch</artifactId>
@@ -126,10 +125,6 @@
 		</dependency>
 
 
-
-
-
-
 	</dependencies>
 
 	<build>
@@ -137,8 +132,21 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<executable>true</executable>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>org.weaver.alr.batch.Application</mainClass>
+						</manifest>
+					</archive>
 				</configuration>
 			</plugin>
 		</plugins>
