@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 import java.util.Comparator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -13,7 +15,7 @@ import org.weaver.alr.batch.common.util.StringUtil;
 import org.weaver.alr.batch.model.ArticleImageVO;
 import org.weaver.alr.batch.parse.comparator.ComparatorFactory;
 
-import com.gs.collections.impl.set.sorted.mutable.TreeSortedSet;
+
 
 public class MyHtmlParser extends HtmlParser{
 	
@@ -34,7 +36,8 @@ public class MyHtmlParser extends HtmlParser{
 		if(elements == null || elements.isEmpty()){
 			return null;
 		}
-		TreeSortedSet<ArticleImageVO> treeSortedSet = new TreeSortedSet<ArticleImageVO>(comparator);
+		
+		SortedSet<ArticleImageVO> treeSortedSet = new TreeSet<ArticleImageVO>(comparator);
 		Elements imgElements;
 		try {
 			imgElements = elements.select("img");
@@ -51,7 +54,7 @@ public class MyHtmlParser extends HtmlParser{
 		}
 
 		if(treeSortedSet.size()>0){
-			return  treeSortedSet.getLast().getSrc();
+			return  treeSortedSet.last().getSrc();
 		}
 
 		return null;

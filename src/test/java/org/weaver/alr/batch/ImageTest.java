@@ -7,6 +7,7 @@ import java.net.URL;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.weaver.alr.batch.common.util.ImageReaderUtil;
+import org.weaver.alr.batch.common.util.FileUtil;
 
 public class ImageTest {
 
@@ -19,7 +20,7 @@ public class ImageTest {
 		try {
 			String src = "http://img.hani.co.kr/imgdb/resize/2016/0630/146716353398_20160630.JPG";
 			url = new URL(src);
-			f = new File("test.jpg");
+			f = FileUtil.creatTempFile(url);
 			System.out.println(f.getAbsolutePath());
 			FileUtils.copyURLToFile(url, f);
 			System.out.println(url);
