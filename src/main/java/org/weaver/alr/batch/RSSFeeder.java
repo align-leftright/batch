@@ -39,32 +39,31 @@ public class RSSFeeder extends Thread{
 
 	@Autowired
 	private DynamicChannelResolver dynamicChannelResolver;
-
 	
-	String channelName;
-	String url;
-	List<PipelineVO> pipelineList;
-	Output output;
+	private String channelName;
+	private String url;
+	private List<PipelineVO> pipelineList;
+	private Output output;
 	
 	
 	@Override
 	public void run() {
 		try {
 			ChannelManagement channelManagement = dynamicChannelResolver.resolve(url);
-			logger.debug(url);
+			logger.info(url);
 			PollableChannel feedChannel = (PollableChannel) channelManagement.channel;
 			channelManagement.start();
 
 			Message<SyndEntry> message;
 			while( (message = (Message<SyndEntry>)feedChannel.receive()) != null){
 
-				logger.debug("----------------------------------------------------------");
 				SyndEntry entry = (SyndEntry)message.getPayload();
 				MySyndEntry myEntry = new MySyndEntry(entry);
 
 				PipelineManager pipelineManager = buildPipelineManager(channelName, pipelineList);
 				processPipe(myEntry, pipelineManager);
-				logger.debug(myEntry.getSyndEntry().getLink());
+				logger.info("----------------------------------------------------------");
+				logger.info(myEntry.getSyndEntry().getLink());
 				processOutput(myEntry, output, channelName);
 				
 			}

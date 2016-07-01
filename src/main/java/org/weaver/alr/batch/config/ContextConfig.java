@@ -8,6 +8,7 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +17,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
 @ComponentScan(basePackages={"org.weaver.alr.batch"})
-@EnableAutoConfiguration
+@EnableAutoConfiguration(exclude = WebMvcAutoConfiguration.class)
 @PropertySource("classpath:properties/config.properties")
 public class ContextConfig {
 
