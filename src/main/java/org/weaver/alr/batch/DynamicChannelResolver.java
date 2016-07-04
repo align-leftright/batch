@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DynamicChannelResolver 
-{
 
+{
 	public static final int MAX_CACHE_SIZE = 999999;
 
 	private static final String CONFIG_PATH = "pollableChannelFeedContext.xml";

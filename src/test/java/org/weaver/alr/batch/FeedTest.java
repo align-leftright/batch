@@ -1,5 +1,6 @@
 package org.weaver.alr.batch;
 
+import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +16,9 @@ public class FeedTest extends MyConfig{
 
 	@Test
 	public void test() throws InterruptedException{
+		
 		logger.info("test");
-
-//		rSSManager.init(null);
+		rSSManager.init(null);
 //		rSSManager.run();
 
 	}

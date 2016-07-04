@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.Resource;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.weaver.alr.batch.common.util.FileUtil;
@@ -33,26 +34,15 @@ public class RSSManager {
 
 	private List<SettingVO> settingList;
 	
-	public void init(String path){
-		logger.info("init");
-
-		if(	StringUtil.isEmpty(path) ){
-			path = "channels";
-		}
-		
-		settingList = new LinkedList<SettingVO>();
-		List<File> fileList = FileUtil.listFilesForFolder(FileUtil.getFile(path));
-		for(File file : fileList){
-			String config = FileUtil.readFile(file);
-			SettingVO setting = (SettingVO) JsonUtil.fromJson(config, SettingVO.class);
-			settingList.add(setting);
-		}
+	public void init(List<SettingVO> settingList){
+		this.settingList = settingList;
 	}
 	
-	
 	public void run() throws InterruptedException {
-		logger.info("test");
-		System.out.println("settingList size : "+settingList.size());
+		logger.info("run");
+		if(settingList == null || settingList.size()==0){
+			return;
+		}
 		for(SettingVO setting : settingList){
 			run(setting);
 		}

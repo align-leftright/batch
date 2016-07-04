@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +13,24 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 public class FileUtil {
+	
+	
+	public static String readInputStream(final InputStream is){
+		
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		StringBuilder sb= new StringBuilder();
+		String str;
+	
+		try {
+			while( (str= br.readLine()) != null ){
+				sb.append(str);
+			}
+		} catch (IOException e) {
+			return null;
+		} 
+		
+		return sb.toString();
+	}
 
 	public static String readFile(final File file){
 		BufferedReader br = null;
@@ -68,5 +88,16 @@ public class FileUtil {
 	    }
 	    return fileList;
 	}
+	
+	
+	public URL getURL(String name){
+		URL url = getClass().getClassLoader().getResource(name);
+		return url;
+	}
+	
+	public File getFile(final URL url){
+		return new File(url.getFile());
+	}
+	
 	
 }

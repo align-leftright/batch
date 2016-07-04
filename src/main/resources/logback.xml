@@ -1,15 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="30 seconds">
 
+	<property name="MNT_LOG_PATH_NAME" value="/mnt/logs/alr/batch" />
+
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d{HH:mm:ss.SSS} %logger{36} - %msg%n</pattern>
 		</encoder>
 	</appender>
 
+	<appender name="MNT_FILE_LOG"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${MNT_LOG_PATH_NAME}.log</file>
+		<append>true</append>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${MNT_LOG_PATH_NAME}.%d{yyyy-MM-dd}.log
+			</fileNamePattern>
+			<maxHistory>60</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
 	<root level="info">
 		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="MNT_FILE_LOG" />
 	</root>
-
 
 </configuration>
