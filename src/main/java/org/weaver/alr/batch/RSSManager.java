@@ -1,19 +1,19 @@
 package org.weaver.alr.batch;
 
-import java.io.File;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.Resource;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.integration.metadata.PropertiesPersistingMetadataStore;
+import org.springframework.messaging.PollableChannel;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
-import org.weaver.alr.batch.common.util.FileUtil;
 import org.weaver.alr.batch.common.util.JsonUtil;
-import org.weaver.alr.batch.common.util.StringUtil;
+import org.weaver.alr.batch.config.FeedInfo;
+import org.weaver.alr.batch.config.IntConfig;
 import org.weaver.alr.batch.model.SettingVO;
 import org.weaver.alr.batch.model.TaskVO;
 import org.weaver.alr.batch.output.impl.ElasticSearchOutput;
@@ -32,25 +32,15 @@ public class RSSManager {
 	@Autowired
 	private ElasticSearchOutput output;
 
-	private List<SettingVO> settingList;
 	
-	public void init(List<SettingVO> settingList){
-		this.settingList = settingList;
+	public void run(List<SettingVO> fileList) throws InterruptedException {
+		for(SettingVO settingVO : fileList){
+			run(settingVO);
+		}
 	}
 	
-	public void run() throws InterruptedException {
-		logger.info("run");
-		if(settingList == null || settingList.size()==0){
-			return;
-		}
-		for(SettingVO setting : settingList){
-			run(setting);
-		}
-
-	}
-
-	private void run(SettingVO setting) throws InterruptedException{
-		List<TaskVO> tasks = setting.getTasks();
+	public void run(SettingVO settingVO) throws InterruptedException{
+		List<TaskVO> tasks = settingVO.getTasks();
 		for(int i=0 ; i<tasks.size() ; i++){
 			TaskVO task = tasks.get(i);
 			logger.info("----------------"+i+"------------------------");
@@ -59,16 +49,46 @@ public class RSSManager {
 			logger.info(JsonUtil.toJson(task.getOutput()));
 
 			RSSFeeder rSSFeeder = context.getBean(RSSFeeder.class);
-			rSSFeeder.initialize(task.getName(), task.getInput().getUrl(), task.getPipeline(), output);
+			Object[] result = createFeedChannel(task.getName(), task.getInput().getUrl());
+			PollableChannel feedChannel = (PollableChannel)result[0];
+			PropertiesPersistingMetadataStore metadataStore =(PropertiesPersistingMetadataStore)result[1];
+			
+			rSSFeeder.initialize(task.getName(), feedChannel, metadataStore, task.getPipeline(), output);
 			taskExecutor.execute(rSSFeeder);
 		}
 	}
+	
 	
 	public int getActiveCount(){
 		return taskExecutor.getActiveCount();
 	}
 	
+	
 	public void shutdown(){
 		taskExecutor.shutdown();
 	}
+	
+	
+	private Object[] createFeedChannel(String name, String url){
+		logger.info("createFeed");
+		logger.info(name);
+		logger.info(url);
+
+		ApplicationContext conext = initApplicationContext(name, url);
+		PollableChannel feedChannel = conext.getBean(PollableChannel.class);
+		PropertiesPersistingMetadataStore metadataStore = conext.getBean(PropertiesPersistingMetadataStore.class);
+
+		Object[] result = {feedChannel, metadataStore};
+		return result;
+	}
+
+	private synchronized ApplicationContext initApplicationContext(String name, String url){
+		IntConfig.queue.add(new FeedInfo(name, url));
+		ApplicationContext conext = new AnnotationConfigApplicationContext(IntConfig.class);
+		IntConfig.queue.remove();
+		return conext;
+	}
+
+
+
 }

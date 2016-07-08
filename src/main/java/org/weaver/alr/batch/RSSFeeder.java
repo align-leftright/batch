@@ -8,12 +8,12 @@ import java.util.Map;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.integration.metadata.PropertiesPersistingMetadataStore;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.stereotype.Component;
-import org.weaver.alr.batch.DynamicChannelResolver.ChannelManagement;
 import org.weaver.alr.batch.common.Constants;
 import org.weaver.alr.batch.common.util.DateUtIl;
 import org.weaver.alr.batch.common.util.JsoupUtil;
@@ -32,55 +32,58 @@ import org.weaver.alr.batch.pipeline.impl.HtmlSearchPipe;
 import com.rometools.rome.feed.synd.SyndEntry;
 
 @Component
-@Scope("prototype")
+@Scope(scopeName=ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RSSFeeder extends Thread{
 
 	private static final Logger logger = LoggerFactory.getLogger(RSSFeeder.class);
 
-	@Autowired
-	private DynamicChannelResolver dynamicChannelResolver;
-	
 	private String channelName;
-	private String url;
 	private List<PipelineVO> pipelineList;
 	private Output output;
+	private PollableChannel channel;
+	private PropertiesPersistingMetadataStore metadataStore;
 	
+	
+	private boolean isInitialized = false;
+
+
+	public void initialize(String channelName, PollableChannel channel, PropertiesPersistingMetadataStore metadataStore, List<PipelineVO> pipelineList, Output output){
+		this.channelName = channelName;
+		this.pipelineList = pipelineList;
+		this.output = output;
+		this.channel = channel;
+		this.metadataStore = metadataStore;
+		isInitialized = true;
+	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
+
+		if(!isInitialized){
+			return;
+		}
+
 		try {
-			ChannelManagement channelManagement = dynamicChannelResolver.resolve(url);
-			logger.info(url);
-			PollableChannel feedChannel = (PollableChannel) channelManagement.channel;
-			channelManagement.start();
+			PipelineManager pipelineManager = buildPipelineManager(channelName, pipelineList);
 
 			Message<SyndEntry> message;
-			while( (message = (Message<SyndEntry>)feedChannel.receive()) != null){
-
+			while((message = (Message<SyndEntry>) channel.receive(10000)) != null) {
 				SyndEntry entry = (SyndEntry)message.getPayload();
 				MySyndEntry myEntry = new MySyndEntry(entry);
-
-				PipelineManager pipelineManager = buildPipelineManager(channelName, pipelineList);
 				processPipe(myEntry, pipelineManager);
 				logger.info("----------------------------------------------------------");
 				logger.info(myEntry.getSyndEntry().getLink());
 				processOutput(myEntry, output, channelName);
-				
-			}
+				metadataStore.flush();
+			}  
 
-		} catch(Exception e ){
+		}catch(Exception e ){
 			logger.error(e.toString());
 		}
 	}
-	
-	public void initialize(String channelName, String url, List<PipelineVO> pipelineList, Output output){
-		this.channelName = channelName;
-		this.url = url;
-		this.pipelineList = pipelineList;
-		this.output = output;
-	}
-	
+
+
 
 	private PipelineManager buildPipelineManager(String channelName, List<PipelineVO> pipelineList){
 
@@ -131,18 +134,18 @@ public class RSSFeeder extends Thread{
 
 	private void processOutput(MySyndEntry myEntry, Output output, String channelName){
 		Map<String, Object> map = new HashMap<String, Object>();
-		
+
 		if(output == null){
 			return;
 		}
-		
+
 		if(output instanceof ElasticSearchOutput){
 			String docId = generateDocId(myEntry.getSyndEntry().getPublishedDate());
 
 			map.put(ElasticSearchOutput.KEY_DOC_ID, docId);
 			map.put(ElasticSearchOutput.KEY_INDEX, Constants.ES_INDEX);
 			map.put(ElasticSearchOutput.KEY_DOC_TYPE, Constants.ES_TYPE_NEWS);
-			
+
 			News metadata = new News();
 			metadata.setChannel(channelName);
 			metadata.setDescription(myEntry.getShortBody());
@@ -151,15 +154,15 @@ public class RSSFeeder extends Thread{
 			metadata.setLinkUrl(myEntry.getSyndEntry().getLink());
 			metadata.setTitle(myEntry.getSyndEntry().getTitle());
 			metadata.setPublishedDate(myEntry.getSyndEntry().getPublishedDate());
-			
+
 			map.put(ElasticSearchOutput.KEY_DOC, metadata);
 		}else{
 			return;
 		}
-		
+
 		output.send(map);
 	}
-	
+
 	private String generateDocId(Date date){
 		StringBuilder sb = new StringBuilder();
 		sb.append(DateUtIl.getDate(date));
@@ -167,6 +170,8 @@ public class RSSFeeder extends Thread{
 	}
 	
 	
+
+
 
 }
 

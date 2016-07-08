@@ -8,4 +8,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes={org.weaver.alr.batch.config.ContextConfig.class})
 public class MyConfig {
 
+	
+	
+	
 }
