@@ -16,7 +16,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
 @ComponentScan(basePackages={"org.weaver.alr.batch"}, 
-				excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = "org.weaver.alr.batch.config.IntConfig.*"))
+				excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = "org.weaver.alr.batch.config.*"))
 //@EnableAutoConfiguration(exclude = WebMvcAutoConfiguration.class)
 @PropertySource("classpath:properties/config.properties")
 public class ContextConfig {

@@ -1,0 +1,19 @@
+{
+  "tasks": [
+    {
+      "name": "tvN",
+      "input": {
+        "type": "rss",
+        "name": "tvN",
+        "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC78PMQprrZTbU0IlMDsYZPw"
+      },
+      "output": {
+        "type": "file"
+      }
+    }
+  ],
+  "reload": {
+    "enable": "true",
+    "period": ""
+  }
+}

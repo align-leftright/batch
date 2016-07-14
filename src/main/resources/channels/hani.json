@@ -39,8 +39,8 @@
         }
       ],
       "output": {
-        "type": "file",
         "host": "",
+        "type": "file",
         "port": 9200,
         "index": ""
       }
