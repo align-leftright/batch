@@ -7,3 +7,4 @@ public interface Output {
 	public void send(Map<String, Object> message);
 	
 }
+

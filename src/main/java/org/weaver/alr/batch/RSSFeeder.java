@@ -23,7 +23,6 @@ import org.weaver.alr.batch.model.MySyndEntry;
 import org.weaver.alr.batch.model.PipeVO;
 import org.weaver.alr.batch.model.PipelineVO;
 import org.weaver.alr.batch.output.Output;
-import org.weaver.alr.batch.output.impl.ElasticSearchOutput;
 import org.weaver.alr.batch.pipeline.PipelineManager;
 import org.weaver.alr.batch.pipeline.SyncPipe;
 import org.weaver.alr.batch.pipeline.impl.HtmlParserPipe;
@@ -42,8 +41,8 @@ public class RSSFeeder extends Thread{
 	private Output output;
 	private PollableChannel channel;
 	private PropertiesPersistingMetadataStore metadataStore;
-	
-	
+
+
 	private boolean isInitialized = false;
 
 
@@ -55,7 +54,7 @@ public class RSSFeeder extends Thread{
 		this.metadataStore = metadataStore;
 		isInitialized = true;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
@@ -133,43 +132,35 @@ public class RSSFeeder extends Thread{
 	}
 
 	private void processOutput(MySyndEntry myEntry, Output output, String channelName){
+		
 		Map<String, Object> map = new HashMap<String, Object>();
+		
+		String docId = generateDocId(myEntry.getSyndEntry().getPublishedDate());
+		map.put(Constants.Output.KEY_DOC_ID, docId);
 
-		if(output == null){
-			return;
+		News metadata = new News();
+		metadata.setChannel(channelName);
+		metadata.setDescription(myEntry.getShortBody());
+		metadata.setId(docId);
+		metadata.setImageUrl(myEntry.getImageUri());
+		metadata.setLinkUrl(myEntry.getSyndEntry().getLink());
+		metadata.setTitle(myEntry.getSyndEntry().getTitle());
+		metadata.setPublishedDate(myEntry.getSyndEntry().getPublishedDate());
+		map.put(Constants.Output.KEY_DOC, metadata);
+	
+		if(output != null){
+			output.send(map);
 		}
-
-		if(output instanceof ElasticSearchOutput){
-			String docId = generateDocId(myEntry.getSyndEntry().getPublishedDate());
-
-			map.put(ElasticSearchOutput.KEY_DOC_ID, docId);
-			map.put(ElasticSearchOutput.KEY_INDEX, Constants.ES_INDEX);
-			map.put(ElasticSearchOutput.KEY_DOC_TYPE, Constants.ES_TYPE_NEWS);
-
-			News metadata = new News();
-			metadata.setChannel(channelName);
-			metadata.setDescription(myEntry.getShortBody());
-			metadata.setId(docId);
-			metadata.setImageUrl(myEntry.getImageUri());
-			metadata.setLinkUrl(myEntry.getSyndEntry().getLink());
-			metadata.setTitle(myEntry.getSyndEntry().getTitle());
-			metadata.setPublishedDate(myEntry.getSyndEntry().getPublishedDate());
-
-			map.put(ElasticSearchOutput.KEY_DOC, metadata);
-		}else{
-			return;
-		}
-
-		output.send(map);
 	}
 
+	
 	private String generateDocId(Date date){
 		StringBuilder sb = new StringBuilder();
 		sb.append(DateUtIl.getDate(date));
 		return sb.toString();
 	}
-	
-	
+
+
 
 
 

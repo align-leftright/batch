@@ -57,7 +57,7 @@ public class JihoTest {
 		try {
 			Message<SyndEntry> message;
 			
-			int count=0;
+//			int count=0;
 			while((message = (Message<SyndEntry>) feedChannel.receive()) != null){
 				SyndEntry entry = message.getPayload();
 				System.out.println(name+" : "+entry.getPublishedDate() + " - " + entry.getTitle());

@@ -11,12 +11,16 @@ import org.springframework.integration.metadata.PropertiesPersistingMetadataStor
 import org.springframework.messaging.PollableChannel;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
+import org.weaver.alr.batch.common.Constants;
 import org.weaver.alr.batch.common.util.JsonUtil;
 import org.weaver.alr.batch.config.FeedInfo;
 import org.weaver.alr.batch.config.IntConfig;
+import org.weaver.alr.batch.model.OutputVO;
 import org.weaver.alr.batch.model.SettingVO;
 import org.weaver.alr.batch.model.TaskVO;
+import org.weaver.alr.batch.output.Output;
 import org.weaver.alr.batch.output.impl.ElasticSearchOutput;
+import org.weaver.alr.batch.output.impl.FileOutput;
 
 @Component
 public class RSSManager {
@@ -29,9 +33,12 @@ public class RSSManager {
 	@Autowired
 	private ThreadPoolTaskExecutor taskExecutor;
 	
+	
 	@Autowired
-	private ElasticSearchOutput output;
-
+	private ElasticSearchOutput esOutput;
+	
+	@Autowired
+	private FileOutput fileOutput;
 	
 	public void run(List<SettingVO> fileList) throws InterruptedException {
 		for(SettingVO settingVO : fileList){
@@ -52,11 +59,25 @@ public class RSSManager {
 			Object[] result = createFeedChannel(task.getName(), task.getInput().getUrl());
 			PollableChannel feedChannel = (PollableChannel)result[0];
 			PropertiesPersistingMetadataStore metadataStore =(PropertiesPersistingMetadataStore)result[1];
-			
+			Output output = selectOutput(task.getOutput());
 			rSSFeeder.initialize(task.getName(), feedChannel, metadataStore, task.getPipeline(), output);
 			taskExecutor.execute(rSSFeeder);
 		}
 	}
+	
+	
+	private Output selectOutput(OutputVO output){
+		
+		String type = output.getType();
+		if(Constants.Output.TYPE_ES.equals(type)){
+			return esOutput;
+		}else if(Constants.Output.TYPE_FILE.equals(type)){
+			return fileOutput;
+		}
+		return null;
+		
+	}
+	
 	
 	
 	public int getActiveCount(){

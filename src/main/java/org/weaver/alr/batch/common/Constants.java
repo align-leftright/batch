@@ -1,8 +1,20 @@
 package org.weaver.alr.batch.common;
 
 public class Constants {
+	
+	public class Output{
+		public static final String TYPE_FILE = "file";
+		public static final String TYPE_ES   = "elasticsearch";
+		
+		public static final String KEY_DOC_ID = "docId";
+		public static final String KEY_DOC = "doc";
+		
+		
+	}
+
+
 	public static final String ES_INDEX		= "alr";
 	public static final String ES_TYPE_NEWS	= "news";
-	public static final String ES_TYPE_USER	= "user";
-	public static final String ES_TYPE_COMMENT = "comment";
+
+
 }
