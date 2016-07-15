@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import org.omg.CosNaming.IstringHelper;
+
 @SuppressWarnings("rawtypes")
 public class PipelineManager {
 
@@ -40,7 +42,6 @@ public class PipelineManager {
 		for(String key : pipesMap.keySet()){
 
 			LinkedList<Pipe> pipeList = pipesMap.get(key);
-
 			Object input = initialInput;
 			Object output = null;
 			Pipe handler;
@@ -50,8 +51,12 @@ public class PipelineManager {
 				output = handler.process(input);
 				input = output;
 			}
+			if(output instanceof Map){
+				resultMap.putAll((Map<? extends String, ? extends Object>) output);
+			}else{
+				resultMap.put(key, output);
+			}
 
-			resultMap.put(key, output);
 		}
 
 		return resultMap;

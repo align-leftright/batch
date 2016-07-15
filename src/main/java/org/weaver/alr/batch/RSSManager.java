@@ -33,7 +33,6 @@ public class RSSManager {
 	@Autowired
 	private ThreadPoolTaskExecutor taskExecutor;
 	
-	
 	@Autowired
 	private ElasticSearchOutput esOutput;
 	

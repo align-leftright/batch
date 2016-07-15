@@ -18,12 +18,12 @@ import org.weaver.alr.batch.model.SettingVO;
 public class Application {
 
 	private static final Logger logger = LoggerFactory.getLogger(Application.class);
+	
 
 	public static void main(String[] args) {
 
 		logger.info("main------------------");
-		System.setProperty("http.proxyHost", "168.219.61.252");
-		System.setProperty("http.proxyPort", "8080");
+		initSystem();
 		
 		ApplicationContext ctx = SpringApplication.run(ContextConfig.class, args);
 		RSSManager rSSManager = ctx.getBean(RSSManager.class);
@@ -39,6 +39,15 @@ public class Application {
 
 	}
 
+	public static void initSystem(){
+		System.setProperty("spring.main.web-environment", "false");
+		System.setProperty("http.proxyHost", "168.219.61.252");
+		System.setProperty("http.proxyPort", "8080");
+		System.setProperty("https.proxyHost", "168.219.61.252");
+		System.setProperty("https.proxyPort", "8080");
+	}
+	
+	
 	public void printBeans(ApplicationContext ctx){
 		String[] beanNames = ctx.getBeanDefinitionNames();
 		Arrays.sort(beanNames);

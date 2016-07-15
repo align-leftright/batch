@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -16,8 +15,6 @@ import org.springframework.messaging.PollableChannel;
 import org.springframework.stereotype.Component;
 import org.weaver.alr.batch.common.Constants;
 import org.weaver.alr.batch.common.util.DateUtIl;
-import org.weaver.alr.batch.common.util.JsoupUtil;
-import org.weaver.alr.batch.common.util.StringUtil;
 import org.weaver.alr.batch.metadata.News;
 import org.weaver.alr.batch.model.MySyndEntry;
 import org.weaver.alr.batch.model.PipeVO;
@@ -27,6 +24,8 @@ import org.weaver.alr.batch.pipeline.PipelineManager;
 import org.weaver.alr.batch.pipeline.SyncPipe;
 import org.weaver.alr.batch.pipeline.impl.HtmlParserPipe;
 import org.weaver.alr.batch.pipeline.impl.HtmlSearchPipe;
+import org.weaver.alr.batch.pipeline.impl.SyndToElementPipe;
+import org.weaver.alr.batch.pipeline.impl.YoutubeMediaParsePipe;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 
@@ -69,10 +68,13 @@ public class RSSFeeder extends Thread{
 			Message<SyndEntry> message;
 			while((message = (Message<SyndEntry>) channel.receive(10000)) != null) {
 				SyndEntry entry = (SyndEntry)message.getPayload();
-				MySyndEntry myEntry = new MySyndEntry(entry);
-				processPipe(myEntry, pipelineManager);
+				
+				
+				MySyndEntry myEntry = processPipe(entry, pipelineManager);
+				
 				logger.info("----------------------------------------------------------");
-				logger.info(myEntry.getSyndEntry().getLink());
+				logger.info(myEntry.toString());
+				
 				processOutput(myEntry, output, channelName);
 				metadataStore.flush();
 			}  
@@ -81,7 +83,6 @@ public class RSSFeeder extends Thread{
 			logger.error(e.toString());
 		}
 	}
-
 
 
 	private PipelineManager buildPipelineManager(String channelName, List<PipelineVO> pipelineList){
@@ -97,10 +98,15 @@ public class RSSFeeder extends Thread{
 			for(PipeVO pipe : pipelineVO.getPipes()){
 				String pipeName = pipe.getPipe();
 				SyncPipe<?, ?> syncpipe;
-				if("HtmlParserPipe".equals(pipeName)){
+				
+				if("SyndToElementPipe".equals(pipeName)){
+					syncpipe = new SyndToElementPipe();
+				}else if("HtmlParserPipe".equals(pipeName)){
 					syncpipe = new HtmlParserPipe(pipe.getType(), pipe.getSortType());
 				}else if("HtmlSearchPipe".equals(pipeName)){
 					syncpipe = new HtmlSearchPipe(pipe.getType(), pipe.getKey());
+				}else if("YoutubeMediaPipe".equals(pipeName)){
+					syncpipe = new YoutubeMediaParsePipe();
 				}else{
 					break;
 				}
@@ -111,21 +117,22 @@ public class RSSFeeder extends Thread{
 		return pipelineManager;
 	}
 
-	private MySyndEntry processPipe(MySyndEntry myEntry, PipelineManager pipelineManager){
+	private MySyndEntry processPipe(SyndEntry entry, PipelineManager pipelineManager){
 
-		if(pipelineManager == null || StringUtil.isEmpty(myEntry.getSyndEntry().getUri())){
-			return myEntry;
+		if(pipelineManager == null || entry == null){
+			return null;
 		}
+		
+		MySyndEntry myEntry = new MySyndEntry(entry);
 
-		String url = myEntry.getSyndEntry().getUri();
-		Elements elements = JsoupUtil.getAllElements(url);
-		Map<String, Object> result = pipelineManager.doPipeline(elements);
-
+		Map<String, Object> result = pipelineManager.doPipeline(entry);
 		if(result != null){
-			String shortText = (String) result.get("shortText");
-			String imageUrl  = (String) result.get("imageUrl");
+			String shortText = (String) result.get(Constants.Pipeline.SHORT_TEXT);
+			String imageUrl  = (String) result.get(Constants.Pipeline.IMAGE_URL);
+			String contentUrl= (String) result.get(Constants.Pipeline.CONTENT_URL);
 			myEntry.setShortBody(shortText);
-			myEntry.setImageUri(imageUrl);
+			myEntry.setImageUrl(imageUrl);
+			myEntry.setContentUrl(contentUrl);
 		}
 
 		return myEntry;
@@ -142,8 +149,15 @@ public class RSSFeeder extends Thread{
 		metadata.setChannel(channelName);
 		metadata.setDescription(myEntry.getShortBody());
 		metadata.setId(docId);
-		metadata.setImageUrl(myEntry.getImageUri());
-		metadata.setLinkUrl(myEntry.getSyndEntry().getLink());
+		metadata.setImageUrl(myEntry.getImageUrl());
+		
+		if(myEntry.getContentUrl()!=null){
+			metadata.setLinkUrl(myEntry.getContentUrl());
+		}else{
+			metadata.setLinkUrl(myEntry.getSyndEntry().getLink());
+		}
+		
+		
 		metadata.setTitle(myEntry.getSyndEntry().getTitle());
 		metadata.setPublishedDate(myEntry.getSyndEntry().getPublishedDate());
 		map.put(Constants.Output.KEY_DOC, metadata);

@@ -4,7 +4,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.weaver.alr.batch.common.Constants;
 import org.weaver.alr.batch.config.MyConfig;
+import org.weaver.alr.batch.model.Metadata;
 import org.weaver.alr.batch.service.ElasticSearchService;
 
 public class ESTest extends MyConfig {
@@ -16,9 +18,9 @@ public class ESTest extends MyConfig {
 
 	@Test
 	public void test() throws InterruptedException {
-		logger.debug("main");
-//		Metadata m = elasticSearchService.getDocument(Constants.ES_INDEX,Constants.ES_TYPE_NEWS, "1", Metadata.class);
-//		logger.debug(m.toString());
+		logger.info("main");
+		Metadata m = elasticSearchService.getDocument(Constants.ES_INDEX,Constants.ES_TYPE_NEWS, "2016-07-08 05:45:01", Metadata.class);
+		logger.info(m.toString());
 	}
 
 }

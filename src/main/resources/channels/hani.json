@@ -12,6 +12,9 @@
           "name": "shortText",
           "pipes": [
             {
+              "pipe":"SyndToElementPipe"
+            },
+            {
               "pipe": "HtmlSearchPipe",
               "type": "class",
               "key": "article-text"
@@ -25,6 +28,9 @@
         {
           "name": "imageUrl",
           "pipes": [
+            {
+              "pipe":"SyndToElementPipe"
+            },
             {
               "pipe": "HtmlSearchPipe",
               "type": "class",

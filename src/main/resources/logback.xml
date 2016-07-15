@@ -26,7 +26,6 @@
 
 	<root level="info">
 		<appender-ref ref="CONSOLE" />
-		<appender-ref ref="MNT_FILE_LOG" />
 	</root>
 
 </configuration>

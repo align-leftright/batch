@@ -24,21 +24,9 @@ public class JihoTest {
 		System.setProperty("https.proxyHost", "168.219.61.252");
 		System.setProperty("https.proxyPort", "8080");
 		System.out.println("main--------------------------------------------");
-		
-		Thread t1 = new Thread(new Runnable() {
-			public void run() {
-				createFeed("tvN", "https://www.youtube.com/feeds/videos.xml?channel_id=UC78PMQprrZTbU0IlMDsYZPw");
-			}
-		});
-		try {
-			t1.start();
-			Thread.sleep(1000*10);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		createFeed("tvN", "https://www.youtube.com/feeds/videos.xml?channel_id=UC78PMQprrZTbU0IlMDsYZPw");
 	}
 	
-
 	private static void createFeed(String name, String url){
 		System.out.println("createFeed");
 		System.out.println(name);
@@ -55,21 +43,18 @@ public class JihoTest {
 			while((message = (Message<SyndEntry>) feedChannel.receive()) != null){
 				SyndEntry entry = message.getPayload();
 				System.out.println(name+" : "+entry.getPublishedDate() + " - " + entry.getTitle());
-				
-				
+				System.out.println(entry);
 				System.out.println("--------------------------");
 //				ms.flush();
-				if(count++ == 2){
+				if(count++ == 0){
 					break;
 				}
-				
 			}
 		} finally {
 			System.out.println("finish");
 //			ms.flush();
 		}
 	}
-
 
 	private static synchronized ApplicationContext initApplicationContext(String name, String url){
 		TestIntConfig.queue.add(new FeedInfo(name, url));
