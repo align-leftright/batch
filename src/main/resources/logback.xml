@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="30 seconds">
 
-	<property name="MNT_LOG_PATH_NAME" value="/mnt/logs/alr/batch" />
+	<property name="LOG_PATH" value="/mnt/logs/alr/batch" />
 
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
@@ -9,9 +9,9 @@
 		</encoder>
 	</appender>
 
-	<appender name="MNT_FILE_LOG"
+	<appender name="FILE_LOG"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${MNT_LOG_PATH_NAME}.log</file>
+		<file>${LOG_PATH}.log</file>
 		<append>true</append>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>${MNT_LOG_PATH_NAME}.%d{yyyy-MM-dd}.log

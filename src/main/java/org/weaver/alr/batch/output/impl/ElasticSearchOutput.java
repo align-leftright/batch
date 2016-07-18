@@ -15,5 +15,4 @@ public class ElasticSearchOutput extends BasicOutput{
 	public void process(String docId, Object doc) {
 		elasticSearchService.putDocument(Constants.ES_INDEX, Constants.ES_TYPE_NEWS, docId, doc);
 	}
-
 }

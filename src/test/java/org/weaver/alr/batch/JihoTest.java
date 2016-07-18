@@ -2,11 +2,10 @@ package org.weaver.alr.batch;
 
 
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.integration.metadata.PropertiesPersistingMetadataStore;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.PollableChannel;
-import org.weaver.alr.batch.config.FeedInfo;
-import org.weaver.alr.batch.config.TestIntConfig;
+import org.weaver.alr.batch.config.ApplicationContextBuilder;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 
@@ -24,7 +23,8 @@ public class JihoTest {
 		System.setProperty("https.proxyHost", "168.219.61.252");
 		System.setProperty("https.proxyPort", "8080");
 		System.out.println("main--------------------------------------------");
-		createFeed("kim", "http://pod.ssenhosting.com/rss/funronga/funronga.xml");
+		
+		createFeed("youtube", "https://www.youtube.com/feeds/videos.xml?channel_id=UC78PMQprrZTbU0IlMDsYZPw");
 	}
 	
 	private static void createFeed(String name, String url){
@@ -32,9 +32,11 @@ public class JihoTest {
 		System.out.println(name);
 		System.out.println(url);
 		
-		ApplicationContext conext = initApplicationContext(name, url);
+		ApplicationContext conext = ApplicationContextBuilder.build(name, url);
+		testContext(conext);
+		
 		PollableChannel feedChannel = conext.getBean(PollableChannel.class);
-//		PropertiesPersistingMetadataStore ms = conext.getBean(PropertiesPersistingMetadataStore.class);
+		PropertiesPersistingMetadataStore ms = conext.getBean(PropertiesPersistingMetadataStore.class);
 		
 		try {
 			Message<SyndEntry> message;
@@ -45,23 +47,17 @@ public class JihoTest {
 				System.out.println(name+" : "+entry.getPublishedDate() + " - " + entry.getTitle());
 				System.out.println(entry);
 				System.out.println("--------------------------");
-//				ms.flush();
-				if(count++ == 0){
+				ms.flush();
+				if(count++ == 10){
 					break;
 				}
 			}
 		} finally {
 			System.out.println("finish");
-//			ms.flush();
+			ms.flush();
 		}
 	}
 
-	private static synchronized ApplicationContext initApplicationContext(String name, String url){
-		TestIntConfig.queue.add(new FeedInfo(name, url));
-		ApplicationContext conext = new AnnotationConfigApplicationContext(TestIntConfig.class);
-		TestIntConfig.queue.remove();
-		return conext;
-	}
 
 
 	private static void testContext(ApplicationContext context){

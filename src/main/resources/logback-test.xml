@@ -1,29 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="30 seconds">
 
-	<property name="MNT_LOG_PATH_NAME" value="/mnt/logs/alr/batch" />
-
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d{HH:mm:ss.SSS} %logger{36} - %msg%n</pattern>
 		</encoder>
 	</appender>
 
-	<appender name="MNT_FILE_LOG"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${MNT_LOG_PATH_NAME}.log</file>
-		<append>true</append>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${MNT_LOG_PATH_NAME}.%d{yyyy-MM-dd}.log
-			</fileNamePattern>
-			<maxHistory>60</maxHistory>
-		</rollingPolicy>
-		<encoder>
-			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
-			</pattern>
-		</encoder>
+	<property name="USER_HOME" value="C:\\logs" />
+	
+	<appender name="FILE" class="ch.qos.logback.classic.sift.SiftingAppender">
+
+		<!-- This is MDC value -->
+		<!-- We will assign a value to 'logFileName' via Java code -->
+		<discriminator>
+			<key>logFileName</key>
+			<defaultValue>default</defaultValue>
+		</discriminator>
+		
+		<sift>
+		  <!-- A standard RollingFileAppender, the log file is based on 'logFileName' at runtime  -->
+		  <appender name="FILE-${logFileName}"
+			class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<file>${USER_HOME}/${logFileName}.log</file>
+			<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+				<Pattern>
+					%d{yyyy-MM-dd HH:mm:ss} %mdc %level %logger{35} - %msg%n
+				</Pattern>
+			</encoder>
+
+			<rollingPolicy
+				class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+				<FileNamePattern>${USER_HOME}/${logFileName}.%i.log.zip
+				</FileNamePattern>
+				<MinIndex>1</MinIndex>
+				<MaxIndex>10</MaxIndex>
+			</rollingPolicy>
+
+			<triggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+				<MaxFileSize>10MB</MaxFileSize>
+			</triggeringPolicy>
+		  </appender>
+		</sift>
 	</appender>
 
+	<logger name="FILE_LOGGER" level="info" additivity="false">
+		<appender-ref ref="FILE" />
+		<appender-ref ref="CONSOLE" />
+	</logger>
+	
 	<root level="info">
 		<appender-ref ref="CONSOLE" />
 	</root>

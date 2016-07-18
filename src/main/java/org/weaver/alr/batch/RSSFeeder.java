@@ -145,22 +145,21 @@ public class RSSFeeder extends Thread{
 		String docId = generateDocId(myEntry.getSyndEntry().getPublishedDate());
 		map.put(Constants.Output.KEY_DOC_ID, docId);
 
-		News metadata = new News();
-		metadata.setChannel(channelName);
-		metadata.setDescription(myEntry.getShortBody());
-		metadata.setId(docId);
-		metadata.setImageUrl(myEntry.getImageUrl());
+		News news = new News();
+		news.setChannel(channelName);
+		news.setDescription(myEntry.getShortBody());
+		news.setId(docId);
+		news.setImageUrl(myEntry.getImageUrl());
 		
 		if(myEntry.getContentUrl()!=null){
-			metadata.setLinkUrl(myEntry.getContentUrl());
+			news.setLinkUrl(myEntry.getContentUrl());
 		}else{
-			metadata.setLinkUrl(myEntry.getSyndEntry().getLink());
+			news.setLinkUrl(myEntry.getSyndEntry().getLink());
 		}
 		
-		
-		metadata.setTitle(myEntry.getSyndEntry().getTitle());
-		metadata.setPublishedDate(myEntry.getSyndEntry().getPublishedDate());
-		map.put(Constants.Output.KEY_DOC, metadata);
+		news.setTitle(myEntry.getSyndEntry().getTitle());
+		news.setPublishedDate(myEntry.getSyndEntry().getPublishedDate());
+		map.put(Constants.Output.KEY_DOC, news);
 	
 		if(output != null){
 			output.send(map);

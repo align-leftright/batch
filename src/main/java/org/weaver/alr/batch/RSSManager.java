@@ -6,15 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.integration.metadata.PropertiesPersistingMetadataStore;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.weaver.alr.batch.common.Constants;
 import org.weaver.alr.batch.common.util.JsonUtil;
-import org.weaver.alr.batch.config.FeedInfo;
-import org.weaver.alr.batch.config.IntConfig;
+import org.weaver.alr.batch.config.ApplicationContextBuilder;
 import org.weaver.alr.batch.model.OutputVO;
 import org.weaver.alr.batch.model.SettingVO;
 import org.weaver.alr.batch.model.TaskVO;
@@ -74,9 +72,7 @@ public class RSSManager {
 			return fileOutput;
 		}
 		return null;
-		
 	}
-	
 	
 	
 	public int getActiveCount(){
@@ -94,7 +90,7 @@ public class RSSManager {
 		logger.info(name);
 		logger.info(url);
 
-		ApplicationContext conext = initApplicationContext(name, url);
+		ApplicationContext conext = ApplicationContextBuilder.build(name, url);
 		PollableChannel feedChannel = conext.getBean(PollableChannel.class);
 		PropertiesPersistingMetadataStore metadataStore = conext.getBean(PropertiesPersistingMetadataStore.class);
 
@@ -102,12 +98,6 @@ public class RSSManager {
 		return result;
 	}
 
-	private synchronized ApplicationContext initApplicationContext(String name, String url){
-		IntConfig.queue.add(new FeedInfo(name, url));
-		ApplicationContext conext = new AnnotationConfigApplicationContext(IntConfig.class);
-		IntConfig.queue.remove();
-		return conext;
-	}
 
 
 
