@@ -59,7 +59,7 @@ public class RSSManager {
 			PollableChannel feedChannel = (PollableChannel)result[0];
 			PropertiesPersistingMetadataStore metadataStore =(PropertiesPersistingMetadataStore)result[1];
 			Output output = selectOutput(task.getOutput());
-			rSSFeeder.initialize(task.getName(), feedChannel, metadataStore, task.getPipeline(), output);
+			rSSFeeder.initialize(task.getName(), task.getInput().getUrl(), feedChannel, metadataStore, task.getPipeline(), output);
 			taskExecutor.execute(rSSFeeder);
 		}
 	}

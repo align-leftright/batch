@@ -15,6 +15,7 @@ import org.springframework.messaging.PollableChannel;
 import org.springframework.stereotype.Component;
 import org.weaver.alr.batch.common.Constants;
 import org.weaver.alr.batch.common.util.DateUtIl;
+import org.weaver.alr.batch.common.util.HashUtil;
 import org.weaver.alr.batch.metadata.News;
 import org.weaver.alr.batch.model.MySyndEntry;
 import org.weaver.alr.batch.model.PipeVO;
@@ -36,17 +37,17 @@ public class RSSFeeder extends Thread{
 	private static final Logger logger = LoggerFactory.getLogger(RSSFeeder.class);
 
 	private String channelName;
+	private String channelUrl;
 	private List<PipelineVO> pipelineList;
 	private Output output;
 	private PollableChannel channel;
 	private PropertiesPersistingMetadataStore metadataStore;
 
-
 	private boolean isInitialized = false;
 
-
-	public void initialize(String channelName, PollableChannel channel, PropertiesPersistingMetadataStore metadataStore, List<PipelineVO> pipelineList, Output output){
+	public void initialize(String channelName, String channelUrl, PollableChannel channel, PropertiesPersistingMetadataStore metadataStore, List<PipelineVO> pipelineList, Output output){
 		this.channelName = channelName;
+		this.channelUrl = channelUrl;
 		this.pipelineList = pipelineList;
 		this.output = output;
 		this.channel = channel;
@@ -68,7 +69,6 @@ public class RSSFeeder extends Thread{
 			Message<SyndEntry> message;
 			while((message = (Message<SyndEntry>) channel.receive(10000)) != null) {
 				SyndEntry entry = (SyndEntry)message.getPayload();
-				
 				
 				MySyndEntry myEntry = processPipe(entry, pipelineManager);
 				
@@ -171,7 +171,8 @@ public class RSSFeeder extends Thread{
 	private String generateDocId(Date date){
 		StringBuilder sb = new StringBuilder();
 		sb.append(DateUtIl.getDate(date));
-		return sb.toString();
+		sb.append(channelUrl);
+		return HashUtil.hashMD5(sb.toString());
 	}
 
 

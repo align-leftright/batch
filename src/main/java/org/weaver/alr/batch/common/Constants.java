@@ -8,7 +8,6 @@ public class Constants {
 		public static final String CONTENT_URL   = "contentUrl";
 	}
 	
-	
 	public class Output{
 		public static final String TYPE_FILE = "file";
 		public static final String TYPE_ES   = "elasticsearch";

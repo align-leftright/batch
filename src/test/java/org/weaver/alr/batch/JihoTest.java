@@ -24,7 +24,7 @@ public class JihoTest {
 		System.setProperty("https.proxyHost", "168.219.61.252");
 		System.setProperty("https.proxyPort", "8080");
 		System.out.println("main--------------------------------------------");
-		createFeed("tvN", "https://www.youtube.com/feeds/videos.xml?channel_id=UC78PMQprrZTbU0IlMDsYZPw");
+		createFeed("kim", "http://pod.ssenhosting.com/rss/funronga/funronga.xml");
 	}
 	
 	private static void createFeed(String name, String url){
